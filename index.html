@@ -38,7 +38,7 @@
       }, {
         name: 'Total Payout',
         header: 'Total Payout',
-        markup: '<output type="number" class="payout">',
+        markup: '<input type="number" class="payout">',
       }, {
         name: 'Error off Total',
         header: 'Total Ticket Error',
@@ -47,7 +47,7 @@
       },  {
         name: 'Total Payout After Error',
         header: 'Total Payout After Error',
-        markup: '<output type="number" class="payoutError">',
+        markup: '<input type="number" class="payoutError">',
       },{
         markup: '<button title="delete this row">X</button>',
         tabStop: false
@@ -84,8 +84,7 @@
 </head>
   <body>
   
-    <table class="table table-striped container"></table>
-
+    <table id="tblExportGrid" export-excel-filename="" class="table table-striped container"></table>
 
     <div class="container">
       <div class="row">
@@ -96,10 +95,19 @@
           <button  class="btn btn-primary" onClick="updatePine()">Update All Price Per Tree Values</button>
           <input value="0.17" step="0.01" type="number" onChange="updatePine()" id="allPineTreeUpdate">
         </div>
-
         <div class="col-sm">
           <button  class="btn btn-primary" onClick="updateError()">Update All Ticket Error Values</button>
           <input value="0"  type="number" onChange="updateError()" id="allErrorTicketsUpdate">        
+        </div>
+      </div>
+      <hr>
+      <div class="row">
+        <div class="col-sm">
+        </div>
+        <div class="col-sm">
+        </div>
+        <div class="col-sm">  
+          <input class="btn btn-primary" type="button" id="btnExport" value="Export Table Data To Excel File" />
         </div>
       </div>
     </div>
@@ -108,6 +116,15 @@
     <br>
 
   <script type="text/javascript">
+
+    $("#btnExport").click(function(){
+      var today = new Date();
+
+      $("#tblExportGrid").attr("export-excel-filename", "Payout_for_"+today);
+      var $table = $("#tblExportGrid");
+      ExportHTMLTableToExcel($table);
+   });
+
 function updateError(){
   i = 0;
   lengthOfList = document.getElementsByClassName('error').length;
@@ -118,8 +135,8 @@ function updateError(){
   for(i; i < lengthOfList;i++){
     document.getElementsByClassName("error")[i].value = updatedError;
     }
-    errorFunction();
     myFunction();
+    errorFunction();
 }
 
 function updatePine(){
@@ -130,8 +147,8 @@ function updatePine(){
   for(i; i < lengthOfList;i++){
     document.getElementsByClassName("priceOfTree")[i].value = updatedPine;
     }
-    errorFunction();
     myFunction();
+    errorFunction();
 }
 
 function errorFunction() {
@@ -149,7 +166,7 @@ function errorFunction() {
     console.log("Spread of error: " + spreadErrPrice)
 
     finalPrice = totalPayout - spreadErrPrice;
-    document.getElementsByClassName("payoutError")[i].innerHTML = roundTo(finalPrice, 2);
+    document.getElementsByClassName("payoutError")[i].value = roundTo(finalPrice, 2);
     }
 }
 
@@ -164,7 +181,7 @@ function errorFunction() {
         priceEachTree = document.getElementsByClassName('priceOfTree')[i].value
         console.log("Ticketnum " + ticketNumber)
         console.log("priceOfTree " + priceEachTree)
-        document.getElementsByClassName("payout")[i].innerHTML = roundTo( priceEachTree * (ticketNumber * 45), 2);
+        document.getElementsByClassName("payout")[i].value = roundTo( priceEachTree * (ticketNumber * 45), 2);
         }
     }
 
@@ -185,6 +202,155 @@ function errorFunction() {
         }
         return n;
     }
+
+
+    $("#btnExport").click(function(){
+      var $table = $("#tblExportGrid");
+      ExportHTMLTableToExcel($table);
+   });
+
+function ExportHTMLTableToExcel($table) {
+    var tab_text = ""
+    var final_text = "";
+    var filename = $table.attr('export-excel-filename'); // attribute to be 
+                                                         // applied on Table tag
+    filename = isNullOrUndefinedWithEmpty(filename)? "Excel Document" : filename;
+    var index = $table.find("tbody tr").length;
+    if (Number(index) > 0) {
+        $.each($table, function (index, item) {
+            var element = $(item);
+            var headertext = $("#" + element[0].id).closest
+                             (":has(label.HeaderLabel)").find('label').text().trim();
+            if (headertext == "") {
+                tab_text = "<table border='2px'><tr>";
+            }
+            else {
+                tab_text = "<table border='2px'><tr> " + headertext + "</tr><tr>";
+            }
+
+            // Create column header
+            element.find("thead tr th").each(function () {
+                if (!$(this).hasClass("NoExport"))
+                    tab_text = tab_text + "<td bgcolor='#87AFC6'>" + 
+                               $(this)[0].innerHTML + "</td>";
+            });
+
+            //Close column header
+            tab_text = tab_text + "</tr>";
+
+            // Create body column
+            element.find(" tbody tr").each(function () {
+                tab_text = tab_text + "<tr>";
+                $(this).find("td").each(function () {
+                    if ($(this).hasClass("ExportLabelTD"))
+                    {
+                        var value = $(this).html();
+                         tab_text = tab_text + "<th>" + value + "</th>";
+                    }
+                    else {
+                        $(this).find("input,select").each(function () {
+                            var value = "";
+
+                            if ($(this).prop("type") == 'select-one') {
+                                value = $('option:selected', this).text();
+                            } else {
+                                value = $(this).val();
+                            }
+
+                            if (!$(this).closest("td").hasClass("NoExport") && 
+                                !$(this).hasClass("NoExport")) { // NoExport is used for TD 
+                                        // or tan input tag that not needs to be exported
+                                tab_text = tab_text + "<th>" + value + "</th>";
+                            }
+                        });
+                    }
+                });
+                tab_text = tab_text + "</tr>";
+            });
+
+            // Create colum footer
+            element.find("tfoot tr td").each(function () {
+                var colspan = $(this).attr("colspan");
+                var rowspan = $(this).attr("rowspan");
+
+                colspan = colspan == undefined ? 1 : colspan;
+                rowspan = rowspan == undefined ? 1 : rowspan;
+
+                if ($(this).hasClass("NoExport")) {
+                    tab_text = tab_text + "";
+                }
+                else if ($(this).hasClass("ExportValueTD")) // Footer class that needs 
+                                                      // to be no td that have input tags
+                {
+                    $(this).find("input,select").each(function () {
+                        var value = "";
+
+                        if ($(this).prop("type") == 'select-one') {
+                            value = $('option:selected', this).text();
+                        } else {
+                            value = $(this).val();
+                        }
+
+                        if (!$(this).closest("td").hasClass("NoExport") && 
+                            !$(this).hasClass("NoExport")) {
+                            tab_text = tab_text + "<td colspan=" + colspan + "rowspan=" + rowspan + ">" + value + "</th>";
+                        }
+                    });
+                }
+                else
+                    tab_text = tab_text + "<td colspan=" + colspan + "rowspan=" + rowspan + ">" + $(this).html() + "</td>";
+            });
+
+            tab_text = tab_text + "<tr></tr></table>";
+
+            if (index == 0) {
+                final_text = tab_text;
+            }
+            else {
+                final_text = final_text + tab_text;
+            }
+        });
+
+        var ua = window.navigator.userAgent;
+        var msie = ua.indexOf("MSIE ");
+
+        if (msie > 0 || !!navigator.userAgent.match
+                     (/Trident.*rv\:11\./))      // If Internet Explorer
+        {
+            txtArea1 = window.open();
+            txtArea1.document.open("txt/html", "replace");
+            txtArea1.document.write(final_text);
+            txtArea1.document.close();
+            txtArea1.focus();
+            sa = txtArea1.document.execCommand("SaveAs", true, filename+".xls");
+            return (sa);
+        }
+        else                 //other browser not tested on IE 11
+        {
+            //sa = window.open('data:application/vnd.ms-excel,' + 
+            //         encodeURIComponent(final_text));
+            var anchor = document.createElement('a');
+            anchor.setAttribute('href', 'data:application/vnd.ms-excel,' + 
+                                 encodeURIComponent(final_text));
+            anchor.setAttribute('download', filename);
+            anchor.style.display = 'none';
+            document.body.appendChild(anchor);
+            anchor.click();
+            document.body.removeChild(anchor);
+        }
+    }
+}
+
+function isNullOrUndefinedWithEmpty(text){
+   if(text==undefined)
+      return true;
+   else if(text == null)
+      return true;
+   else if(text == null)
+      return true;
+   else
+      false;
+}
 
   </script>
   </body>
