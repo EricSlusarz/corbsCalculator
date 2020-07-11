@@ -1,0 +1,100 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>rsLiteGrid Spreadsheet Data Grid Example</title>
+  <link href="https://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.3.1/lumen/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha384-vk5WoKIaW/vJyUAd9n/wmopsmNhiy+L2Z+SBxGYnUkunIxVxAv/UtMOhba/xskxh" crossorigin="anonymous"></script>
+  <script src="../jquery.rsLiteGrid.js"></script>
+  <script>
+    $(document).ready(function () {
+      $('table').rsLiteGrid({
+
+        cols: [{
+          name: 'name',
+          header: 'Name'
+        }, {
+          name: 'gender',
+          header: 'Gender',
+          markup: '<select class="form-control"><option value="male">Male</option><option value="female">Female</option></select>',
+          defaultValue: 'male'
+        }, {
+          name: 'age',
+          header: 'Age',
+          markup: '<input type="number" class="form-control">'
+        }, {
+          name: 'rule',
+          header: 'Rule'
+        }, {
+          // Delete button needs no name, since this columns does not need to be exported to Json
+          markup: '<button title="delete this row">X</button>',
+          tabStop: false
+        }],
+
+        // event fired after each row is appended to the table.
+        // The right place to set the click event for the delete row button
+        onAddRow: function (event, $lastNewRow) {
+          $('button', $lastNewRow).click(function () {
+            $('table').rsLiteGrid('delRow', $lastNewRow);
+          });
+        }
+
+        // load table with 2 rows of data
+      }).rsLiteGrid('setData', [
+        { name: 'John', rule: 'Developer', age: 43 },
+        { name: 'Maria', gender: 'female' }
+      ]);
+
+      // export data
+      $('table + button').click(function () {
+        console.log($('table').rsLiteGrid('getData'));
+        alert('Open your browser console to see the Json data.');
+      })
+    });
+  </script>
+</head>
+<body><div id="jquery-script-menu">
+<div class="jquery-script-center">
+<ul>
+<li><a href="https://www.jqueryscript.net/table/spreadsheet-data-grid-rslite.html">Download This Plugin</a></li>
+<li><a href="https://www.jqueryscript.net/">Back To jQueryScript.Net</a></li>
+</ul>
+<div class="jquery-script-ads"><script type="text/javascript"><!--
+google_ad_client = "ca-pub-2783044520727903";
+/* jQuery_demo */
+google_ad_slot = "2780937993";
+google_ad_width = 728;
+google_ad_height = 90;
+//-->
+</script>
+<script type="text/javascript"
+src="https://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script></div>
+<div class="jquery-script-clear"></div>
+</div>
+</div>
+  <div class="container">
+    <h1>rsLiteGrid Spreadsheet Data Grid Example</h1>
+  <table class="table table-bordered table-striped"></table>
+  <button class="btn btn-primary">Export to Json</button>
+</div>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-36251023-1']);
+  _gaq.push(['_setDomainName', 'jqueryscript.net']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+<body>
+</html>
+

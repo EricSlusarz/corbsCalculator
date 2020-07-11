@@ -1,0 +1,191 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+  
+
+  <title>rsLiteGrid Spreadsheet Data Grid Example</title>
+  <link href="https://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.3.1/lumen/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha384-vk5WoKIaW/vJyUAd9n/wmopsmNhiy+L2Z+SBxGYnUkunIxVxAv/UtMOhba/xskxh" crossorigin="anonymous"></script>  <script src="spreadsheet-data-grid-rslite/src/jquery.rsLiteGrid.js"></script>
+
+  <script>
+
+  $(document).ready(function () {
+    $('table').rsLiteGrid({
+
+      onRemoveRow: function(event, $newRow, index){
+        myFunction();
+        errorFunction();
+      },
+
+      cols: [{
+        name: 'name',
+        header: 'Name'
+      }, {
+        name: '# Of Tickets',
+        header: '# Of Tickets',
+        markup: '<input type="number" class="ticketNum" onchange="myFunction(); errorFunction()">',
+        defaultValue: '15'
+      }, {
+        name: 'Price Per Tree',
+        header: 'Price Per Tree',
+        markup: '<input type="number" class="priceOfTree" onchange="myFunction(); errorFunction()">',
+        defaultValue: '0.17'
+      }, {
+        name: 'Total Payout',
+        header: 'Total Payout',
+        markup: '<output type="number" class="payout">',
+      }, {
+        name: 'Error off Total',
+        header: 'Total Ticket Error',
+        markup: '<input type="number" class="error" onchange="errorFunction()">',
+        defaultValue: '1'
+      },  {
+        name: 'Total Payout After Error',
+        header: 'Total Payout After Error',
+        markup: '<output type="number" class="payoutError">',
+      },{
+        markup: '<button title="delete this row">X</button>',
+        tabStop: false
+      }],
+
+
+
+      // event fired after each row is appended to the table.
+      // The right place to set the click event for the delete row button
+      onAddRow: function (event, $lastNewRow) {
+        $('button', $lastNewRow).click(function () {
+          $('table').rsLiteGrid('delRow', $lastNewRow);
+        });
+      }
+
+      // load table with 2 rows of data
+    }).rsLiteGrid('setData', [
+      { name: 'Eric'},
+      { name: 'Hugo'},
+      { name: 'Kaku'},
+      { name: 'Chili'},
+      { name: 'Bobby'},
+      { name: 'Jeffero'},
+      { name: 'Mike'},
+      { name: 'Matt'},
+      { name: 'Azza'},
+      { name: 'Luke'},
+      { name: 'Jake'},
+      ]);
+  });
+</script>
+
+
+</head>
+  <body>
+  
+    <table class="table table-striped container"></table>
+
+
+    <div class="container">
+      <div class="row">
+        <div class="col-sm">
+          <button class="btn btn-primary" onclick="myFunction(); errorFunction();">Update All Values</button>
+        </div>
+        <div class="col-sm">
+          <button  class="btn btn-primary" onClick="updatePine()">Update All Price Per Tree Values</button>
+          <input value="0.17" step="0.01" type="number" onChange="updatePine()" id="allPineTreeUpdate">
+        </div>
+
+        <div class="col-sm">
+          <button  class="btn btn-primary" onClick="updateError()">Update All Ticket Error Values</button>
+          <input value="0"  type="number" onChange="updateError()" id="allErrorTicketsUpdate">        
+        </div>
+      </div>
+    </div>
+
+    <hr>
+    <br>
+
+  <script type="text/javascript">
+function updateError(){
+  i = 0;
+  lengthOfList = document.getElementsByClassName('error').length;
+  updatedError = document.getElementById("allErrorTicketsUpdate").value;
+  console.log(updatedError + "allErrorTicketsUpdate")
+
+  document.getElementsByClassName("priceOfTree")[i].value
+  for(i; i < lengthOfList;i++){
+    document.getElementsByClassName("error")[i].value = updatedError;
+    }
+    errorFunction();
+    myFunction();
+}
+
+function updatePine(){
+  i = 0;
+  lengthOfList = document.getElementsByClassName('priceOfTree').length;
+  updatedPine = document.getElementById("allPineTreeUpdate").value;
+  console.log(updatedPine + "Update Pine Value All")
+  for(i; i < lengthOfList;i++){
+    document.getElementsByClassName("priceOfTree")[i].value = updatedPine;
+    }
+    errorFunction();
+    myFunction();
+}
+
+function errorFunction() {
+    i = 0;
+    lengthOfList = document.getElementsByClassName('error').length;
+    console.log("lengthOfList " + lengthOfList)
+
+    for(i; i < lengthOfList;i++){
+    totalPayout = document.getElementsByClassName('payout')[i].value
+    priceEachTree = document.getElementsByClassName('priceOfTree')[i].value
+    errorCorrection = document.getElementsByClassName('error')[i].value
+    var trayprice = 45 * priceEachTree;
+    console.log("trayprice " + trayprice);
+    spreadErrPrice =  trayprice * errorCorrection / lengthOfList;
+    console.log("Spread of error: " + spreadErrPrice)
+
+    finalPrice = totalPayout - spreadErrPrice;
+    document.getElementsByClassName("payoutError")[i].innerHTML = roundTo(finalPrice, 2);
+    }
+}
+
+    function myFunction() {
+        i = 0;
+        lengthOfList = document.getElementsByClassName('priceOfTree').length;
+
+                console.log("lengthOfList " + lengthOfList)
+
+        for(i; i < lengthOfList;i++){
+        ticketNumber = document.getElementsByClassName('ticketNum')[i].value
+        priceEachTree = document.getElementsByClassName('priceOfTree')[i].value
+        console.log("Ticketnum " + ticketNumber)
+        console.log("priceOfTree " + priceEachTree)
+        document.getElementsByClassName("payout")[i].innerHTML = roundTo( priceEachTree * (ticketNumber * 45), 2);
+        }
+    }
+
+    function roundTo(n, digits) {
+        var negative = false;
+        if (digits === undefined) {
+            digits = 0;
+        }
+            if( n < 0) {
+            negative = true;
+          n = n * -1;
+        }
+        var multiplicator = Math.pow(10, digits);
+        n = parseFloat((n * multiplicator).toFixed(11));
+        n = (Math.round(n) / multiplicator).toFixed(2);
+        if( negative ) {    
+            n = (n * -1).toFixed(2);
+        }
+        return n;
+    }
+
+  </script>
+  </body>
+</html>
