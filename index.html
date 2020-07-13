@@ -7,7 +7,7 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
   
 
-  <title>rsLiteGrid Spreadsheet Data Grid Example</title>
+  <title>Corbs Calculator</title>
   <link href="https://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.3.1/lumen/bootstrap.min.css">
   <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha384-vk5WoKIaW/vJyUAd9n/wmopsmNhiy+L2Z+SBxGYnUkunIxVxAv/UtMOhba/xskxh" crossorigin="anonymous"></script>  <script src="spreadsheet-data-grid-rslite/src/jquery.rsLiteGrid.js"></script>
@@ -15,25 +15,41 @@
   <script>
 
   $(document).ready(function () {
+    var namesLocalStore = [{}];
+    var retrievedData = localStorage.getItem("namesLocalStoreKey");
+    var JSONdataParsed = JSON.parse(retrievedData);
+
+    function Worker(name) {
+      this.name = name;
+    }
+
+    for(var i = 0; i < JSONdataParsed.length; i++){
+       namesLocalStore[i] = new Worker(JSONdataParsed[i]);
+    }
+
+    console.log(JSONdataParsed)
+
     $('table').rsLiteGrid({
 
       onRemoveRow: function(event, $newRow, index){
         myFunction();
         errorFunction();
+        StoreAllNamesInLocal();
       },
 
       cols: [{
         name: 'name',
-        header: 'Name'
+        header: 'Name',
+        markup: '<input type="string" class="name" onchange="myFunction(); errorFunction(); StoreAllNamesInLocal()">',
       }, {
         name: '# Of Tickets',
         header: '# Of Tickets',
-        markup: '<input type="number" class="ticketNum" onchange="myFunction(); errorFunction()">',
-        defaultValue: '15'
+        markup: '<input type="number" class="ticketNum" onchange="myFunction(); errorFunction(); StoreAllNamesInLocal()">',
+        defaultValue: '30'
       }, {
         name: 'Price Per Tree',
         header: 'Price Per Tree',
-        markup: '<input type="number" class="priceOfTree" onchange="myFunction(); errorFunction()">',
+        markup: '<input type="number" class="priceOfTree" onchange="myFunction(); errorFunction(); StoreAllNamesInLocal()">',
         defaultValue: '0.17'
       }, {
         name: 'Total Payout',
@@ -49,7 +65,7 @@
         header: 'Total Payout After Error',
         markup: '<input type="number" class="payoutError">',
       },{
-        markup: '<button title="delete this row">X</button>',
+        markup: '<button class="btn btn-danger" title="delete this row">X</button>',
         tabStop: false
       }],
 
@@ -60,23 +76,13 @@
       onAddRow: function (event, $lastNewRow) {
         $('button', $lastNewRow).click(function () {
           $('table').rsLiteGrid('delRow', $lastNewRow);
+          myFunction();
+          errorFunction();
+          StoreAllNamesInLocal();
         });
-      }
+      },
 
-      // load table with 2 rows of data
-    }).rsLiteGrid('setData', [
-      { name: 'Eric'},
-      { name: 'Hugo'},
-      { name: 'Kaku'},
-      { name: 'Chili'},
-      { name: 'Bobby'},
-      { name: 'Jeffero'},
-      { name: 'Mike'},
-      { name: 'Matt'},
-      { name: 'Azza'},
-      { name: 'Luke'},
-      { name: 'Jake'},
-      ]);
+    }).rsLiteGrid('setData', namesLocalStore);
   });
 </script>
 
@@ -85,11 +91,10 @@
   <body>
   
     <table id="tblExportGrid" export-excel-filename="" class="table table-striped container"></table>
-
     <div class="container">
       <div class="row">
         <div class="col-sm">
-          <button class="btn btn-primary" onclick="myFunction(); errorFunction();">Update All Values</button>
+          <button class="btn btn-primary" onclick="myFunction(); errorFunction(); StoreAllNamesInLocal();">Update All Values</button>
         </div>
         <div class="col-sm">
           <button  class="btn btn-primary" onClick="updatePine()">Update All Price Per Tree Values</button>
@@ -103,6 +108,7 @@
       <hr>
       <div class="row">
         <div class="col-sm">
+          <input class="btn btn-primary" type="button" id="addNewRow" value="Add new row" />
         </div>
         <div class="col-sm">
         </div>
@@ -117,9 +123,28 @@
 
   <script type="text/javascript">
 
+    function StoreAllNamesInLocal() {
+      i = 0;
+      lengthOfList = document.getElementsByClassName('name').length;
+      var arrayOfAllNames= []; 
+      var allNames = {};
+      var namesArrayForIteration = document.getElementsByClassName('name');
+
+    for(i; i < lengthOfList;i++){
+      allNames.name = namesArrayForIteration[i].value;
+      arrayOfAllNames.push(allNames.name); 
+      }
+      localStorage.setItem("namesLocalStoreKey", JSON.stringify(arrayOfAllNames));
+    }
+
+    $("#addNewRow").click(function(){
+      $('#tblExportGrid').rsLiteGrid('addRow')
+      myFunction();
+      errorFunction();
+   });
+
     $("#btnExport").click(function(){
       var today = new Date();
-
       $("#tblExportGrid").attr("export-excel-filename", "Payout_for_"+today);
       var $table = $("#tblExportGrid");
       ExportHTMLTableToExcel($table);
@@ -137,6 +162,7 @@ function updateError(){
     }
     myFunction();
     errorFunction();
+    StoreAllNamesInLocal();
 }
 
 function updatePine(){
@@ -149,6 +175,7 @@ function updatePine(){
     }
     myFunction();
     errorFunction();
+    StoreAllNamesInLocal();
 }
 
 function errorFunction() {
@@ -167,7 +194,7 @@ function errorFunction() {
 
     finalPrice = totalPayout - spreadErrPrice;
     document.getElementsByClassName("payoutError")[i].value = roundTo(finalPrice, 2);
-    }
+  }
 }
 
     function myFunction() {
@@ -203,11 +230,6 @@ function errorFunction() {
         return n;
     }
 
-
-    $("#btnExport").click(function(){
-      var $table = $("#tblExportGrid");
-      ExportHTMLTableToExcel($table);
-   });
 
 function ExportHTMLTableToExcel($table) {
     var tab_text = ""
