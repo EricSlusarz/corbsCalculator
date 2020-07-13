@@ -23,14 +23,14 @@
       this.name = name;
     }
 
+    if (JSONdataParsed.lenth =! 0){
     for(var i = 0; i < JSONdataParsed.length; i++){
        namesLocalStore[i] = new Worker(JSONdataParsed[i]);
     }
-
+  }
     console.log(JSONdataParsed)
 
     $('table').rsLiteGrid({
-
       onRemoveRow: function(event, $newRow, index){
         myFunction();
         errorFunction();
