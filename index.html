@@ -10,7 +10,8 @@
   <title>Corbs Calculator</title>
   <link href="https://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.3.1/lumen/bootstrap.min.css">
-  <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha384-vk5WoKIaW/vJyUAd9n/wmopsmNhiy+L2Z+SBxGYnUkunIxVxAv/UtMOhba/xskxh" crossorigin="anonymous"></script>  <script src="spreadsheet-data-grid-rslite/src/jquery.rsLiteGrid.js"></script>
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha384-vk5WoKIaW/vJyUAd9n/wmopsmNhiy+L2Z+SBxGYnUkunIxVxAv/UtMOhba/xskxh" crossorigin="anonymous"></script>  
+  <script src="spreadsheet-data-grid-rslite/src/jquery.rsLiteGrid.js"></script>
 
   <script>
 
@@ -93,7 +94,7 @@
     <div class="container">
       <div class="row">
         <div class="col-sm">
-          <button class="btn btn-primary" onclick="myFunction(); errorFunction(); StoreAllNamesInLocal();">Update All Values</button>
+          <label>Total Number of Tickets: </label><br><output class="bold" id="grandTotalNumTickets"></output>
         </div>
         <div class="col-sm">
           <button  class="btn btn-primary" onClick="updatePine()">Update All Price Per Tree Values</button>
@@ -110,6 +111,7 @@
           <input class="btn btn-primary" type="button" id="addNewRow" value="Add New Row" />
         </div>
         <div class="col-sm">
+          <button class="btn btn-primary" onclick="myFunction(); errorFunction(); StoreAllNamesInLocal();">Update All Values</button>
         </div>
         <div class="col-sm">  
           <input class="btn btn-primary" type="button" id="btnExport" value="Export Data To Excel File" />
@@ -199,15 +201,14 @@ function errorFunction() {
     function myFunction() {
         i = 0;
         lengthOfList = document.getElementsByClassName('priceOfTree').length;
-
-                console.log("lengthOfList " + lengthOfList)
+        sumOfTickets = 0;
 
         for(i; i < lengthOfList;i++){
         ticketNumber = document.getElementsByClassName('ticketNum')[i].value
         priceEachTree = document.getElementsByClassName('priceOfTree')[i].value
-        console.log("Ticketnum " + ticketNumber)
-        console.log("priceOfTree " + priceEachTree)
         document.getElementsByClassName("payout")[i].value = roundTo( priceEachTree * (ticketNumber * 45), 2);
+        sumOfTickets = Number(sumOfTickets) + Number(ticketNumber);
+        document.getElementById("grandTotalNumTickets").value = sumOfTickets;
         }
     }
 
